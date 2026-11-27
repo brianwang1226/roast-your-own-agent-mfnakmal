@@ -48,4 +48,13 @@ if (written !== ENTRY || written.split("\n").length !== 1 || written !== written
   );
   process.exit(1);
 }
+// Byte-length guard: the file must hold exactly the entry's UTF-8 bytes —
+// a stray newline or BOM would silently change what the judge reads.
+const writtenBytes = readFileSync(outPath).length;
+if (writtenBytes !== Buffer.byteLength(ENTRY, "utf8")) {
+  console.error(
+    `Entry byte-length mismatch after write: expected ${Buffer.byteLength(ENTRY, "utf8")} bytes, got ${writtenBytes}.`,
+  );
+  process.exit(1);
+}
 console.log(`Wrote ${[...ENTRY].length} characters to ${outPath} (verified)`);
